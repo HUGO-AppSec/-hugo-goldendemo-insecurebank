@@ -7,16 +7,10 @@ pipeline {
         BRIDGE_POLARIS_APPLICATION_NAME = 'Black Duck - Security Demo'
         BRIDGE_POLARIS_PROJECT_NAME = 'Java-InsecureBank-Jenkins'
         BRIDGE_POLARIS_BRANCH_NAME = 'Jenkins-pipeline'
-		BRIDGECLI_LINUX64 = 'https://repo.blackduck.com/bds-integrations-release/com/blackduck/integration/bridge/binaries/bridge-cli-bundle/latest/bridge-cli-bundle-linux64.zip'
+	BRIDGECLI_LINUX64 = 'https://repo.blackduck.com/bds-integrations-release/com/blackduck/integration/bridge/binaries/bridge-cli-bundle/latest/bridge-cli-bundle-linux64.zip'
 	} 
 	
 	stages { 
-        stage('Build') {
-            steps {
-                sh 'mvn -B compile'
-            }
-        }
-		
         stage('Polaris Security Scan') {
             steps {
                 script {
