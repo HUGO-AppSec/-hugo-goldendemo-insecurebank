@@ -11,25 +11,30 @@ name: CI Black Duck security scan
 
 on:
   push:
-    branches: [ "master, polaris, development" ]
+    branches: [master, polaris, development, stage]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "polaris, development" ]
+    branches: [polaris, development, stage]
   # schedule:
     # - cron: '42 10 * * 1'\
   workflow_dispatch:
 jobs:
-  build:
+  Security-scan:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
       security-events: write
       actions: read
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
       - name: Black Duck Security scan
         uses: blackduck-inc/black-duck-security-scan@805cbd09e806b01907bbea0f990723c2bb85abe9
         with:
@@ -46,6 +51,7 @@ jobs:
           polaris_server_url: ${{ secrets.POLARIS_SERVER_URL }}
           polaris_access_token: ${{ secrets.POLARIS_ACCESS_TOKEN }}
           polaris_assessment_types: "SCA,SAST"
+          polaris_test_sca_type: "SCA-SIGNATURE"
           polaris_application_name: ${{ secrets.POLARIS_APPLICATION }}
           polaris_project_name: ${{ secrets.POLARIS_PROJECT }}
           polaris_prComment_enabled: 'true'
@@ -56,4 +62,13 @@ jobs:
           srm_url: ${{ vars.SRM_URL }}
           srm_apikey: ${{ secrets.SRM_API_KEY }}
           srm_assessment_types: "SCA,SAST"
-
+        
+        # include_diagnostics: true
+        
+      - name: Save Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bridge-logs
+          path: ${{ github.workspace }}/.bridge
+          include-hidden-files: true
